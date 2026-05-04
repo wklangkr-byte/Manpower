@@ -267,6 +267,63 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
   border-radius:50%;display:flex;align-items:center;justify-content:center;
   color:#fff;font-size:11px;font-weight:700
 }
+
+/* Sidebar logout button */
+.sb-footer{
+  margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,.12)
+}
+.sb-user-info{
+  display:flex;align-items:center;gap:10px;padding:10px 12px 8px;
+  border-radius:var(--r2)
+}
+.sb-user-avatar{
+  width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:12px;font-weight:700;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.3)
+}
+.sb-user-name{font-size:13px;font-weight:600;color:#fff;line-height:1.3}
+.sb-user-role{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+.btn-logout{
+  display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;
+  border-radius:var(--r2);background:rgba(239,68,68,.12);
+  border:1px solid rgba(239,68,68,.25);color:rgba(255,180,180,.9);
+  cursor:pointer;font-size:13px;font-weight:500;font-family:var(--font);
+  transition:all .15s;margin-top:4px
+}
+.btn-logout:hover{
+  background:rgba(239,68,68,.25);border-color:rgba(239,68,68,.4);
+  color:#fff
+}
+.btn-logout svg{width:16px;height:16px;opacity:.85;flex-shrink:0}
+
+/* Logout confirm modal */
+#logout-modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s
+}
+#logout-modal-bg.open{opacity:1;pointer-events:all}
+.logout-modal{
+  background:#fff;border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  width:380px;max-width:92vw;
+  transform:scale(.95);transition:transform .2s;overflow:hidden
+}
+#logout-modal-bg.open .logout-modal{transform:scale(1)}
+.logout-modal-icon{
+  width:56px;height:56px;background:#FEF2F2;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 14px
+}
+.logout-modal-icon svg{width:26px;height:26px;color:#DC2626}
+.logout-modal-body{padding:28px 24px 20px;text-align:center}
+.logout-modal-title{font-size:17px;font-weight:700;color:#111827;margin-bottom:6px}
+.logout-modal-sub{font-size:13.5px;color:#6B7280;line-height:1.6}
+.logout-modal-foot{
+  display:flex;gap:10px;padding:16px 20px;
+  border-top:1px solid #F3F4F6;background:#FAFAFA
+}
+.logout-modal-foot .btn{flex:1;justify-content:center;font-size:13.5px;padding:10px}
 </style>
 </head>
 <body>
@@ -340,6 +397,22 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
       Dashboard สรุป
     </div>
   </div>
+  <!-- Sidebar Footer: User info + Logout -->
+  <div class="sb-footer">
+    <div class="sb-user-info">
+      <div class="sb-user-avatar" id="sb-avatar">A</div>
+      <div>
+        <div class="sb-user-name" id="sb-user-name">Admin</div>
+        <div class="sb-user-role" id="sb-user-role">Administrator</div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="openLogoutModal()">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+      </svg>
+      ออกจากระบบ
+    </button>
+  </div>
 </aside>
 
 <div class="main">
@@ -348,7 +421,7 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
     <div style="display:flex;align-items:center;gap:16px">
       <span id="fb-status" style="font-size:12px;font-weight:500">🔄 กำลังเชื่อมต่อ...</span>
       <span id="today-lbl" style="font-size:13px;color:var(--tx2)"></span>
-      <div class="user-badge" id="user-badge" onclick="doLogout()" title="คลิกเพื่อออกจากระบบ">
+      <div class="user-badge" id="user-badge" onclick="openLogoutModal()" title="คลิกเพื่อออกจากระบบ">
         <div class="user-avatar" id="user-avatar">A</div>
         <span id="user-name-lbl">Admin</span>
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -569,6 +642,28 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
     <div class="modal-ft">
       <button class="btn btn-outline" id="mdel-cancel">ยกเลิก</button>
       <button class="btn btn-danger" id="mdel-ok">ลบข้อมูล</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGOUT CONFIRM MODAL -->
+<div id="logout-modal-bg">
+  <div class="logout-modal">
+    <div class="logout-modal-body">
+      <div class="logout-modal-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+        </svg>
+      </div>
+      <div class="logout-modal-title">ออกจากระบบ</div>
+      <div class="logout-modal-sub">คุณต้องการออกจากระบบใช่หรือไม่?<br>ข้อมูลที่ยังไม่ได้บันทึกอาจสูญหายได้</div>
+    </div>
+    <div class="logout-modal-foot">
+      <button class="btn btn-outline" onclick="closeLogoutModal()">ยกเลิก</button>
+      <button class="btn btn-danger" onclick="doLogout()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        ออกจากระบบ
+      </button>
     </div>
   </div>
 </div>
@@ -1329,8 +1424,11 @@ function checkAuth() {
 
 function showLogin() {
   const overlay = document.getElementById('login-overlay');
-  overlay.classList.remove('hide');
+  // Reset inline styles left by showApp(), then re-display
+  overlay.style.opacity = '';
+  overlay.style.transition = '';
   overlay.style.display = 'flex';
+  overlay.classList.remove('hide');
   setTimeout(() => document.getElementById('inp-user').focus(), 200);
 }
 
@@ -1338,7 +1436,10 @@ function showApp() {
   const overlay = document.getElementById('login-overlay');
   overlay.style.opacity = '0';
   overlay.style.transition = 'opacity .4s ease';
-  setTimeout(() => { overlay.style.display = 'none'; }, 400);
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.classList.add('hide');
+  }, 400);
   if (currentUser) {
     document.getElementById('user-name-lbl').textContent = currentUser.display;
     document.getElementById('user-avatar').textContent = currentUser.avatar;
@@ -1405,6 +1506,14 @@ function applyRoleUI() {
       : 'linear-gradient(135deg,#059669,#10b981)';
   }
 
+  // Update sidebar footer
+  const sbAvatar = document.getElementById('sb-avatar');
+  const sbUserName = document.getElementById('sb-user-name');
+  const sbUserRole = document.getElementById('sb-user-role');
+  if (sbAvatar) sbAvatar.textContent = currentUser.avatar || currentUser.display.charAt(0).toUpperCase();
+  if (sbUserName) sbUserName.textContent = currentUser.display;
+  if (sbUserRole) sbUserRole.textContent = isAdmin ? 'Administrator' : 'Viewer (ดูข้อมูล)';
+
   // Add role class to body for CSS scoping
   document.body.classList.remove('role-admin','role-viewer');
   document.body.classList.add('role-'+role);
@@ -1461,8 +1570,21 @@ function doLogin() {
   }, 400);
 }
 
+function openLogoutModal() {
+  document.getElementById('logout-modal-bg').classList.add('open');
+}
+
+function closeLogoutModal() {
+  document.getElementById('logout-modal-bg').classList.remove('open');
+}
+
+// Close modal when clicking backdrop
+document.getElementById('logout-modal-bg').addEventListener('click', function(e) {
+  if (e.target === this) closeLogoutModal();
+});
+
 function doLogout() {
-  if (!confirm('ต้องการออกจากระบบใช่หรือไม่?')) return;
+  closeLogoutModal();
   sessionStorage.removeItem('wf_session');
   currentUser = null;
   document.getElementById('inp-user').value = '';
