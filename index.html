@@ -447,7 +447,7 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>วันที่</th><th>ช่วงเวลา</th><th>เลขสาขา</th><th>ชื่อสาขา</th><th>Zone</th><th>Regional</th><th class="tr">Budget</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th></th></tr></thead>
+          <thead><tr><th>วันที่</th><th>ช่วงเวลา</th><th>เลขสาขา</th><th>ชื่อสาขา</th><th>Zone</th><th>Regional</th><th class="tr">BUDGET</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th></th></tr></thead>
           <tbody id="h-tbody"></tbody>
         </table>
         <div class="empty" id="h-empty" style="display:none">
@@ -497,7 +497,7 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
       <div class="card">
         <div class="card-hd"><span class="card-title">ตารางสรุป Regional</span></div>
         <div class="tbl-wrap">
-          <table><thead><tr><th>Regional</th><th>จำนวนสาขา</th><th class="tr">Budget</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th class="tr">อัตรา%</th></tr></thead>
+          <table><thead><tr><th>Regional</th><th>จำนวนสาขา</th><th class="tr">BUDGET</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th class="tr">อัตรา%</th></tr></thead>
           <tbody id="tbl-regional"></tbody></table>
         </div>
       </div>
@@ -517,7 +517,7 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
       <div class="card">
         <div class="card-hd"><span class="card-title">ตารางสรุป Zone</span></div>
         <div class="tbl-wrap">
-          <table><thead><tr><th>Zone</th><th>Regional</th><th>จำนวนสาขา</th><th class="tr">Budget</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th class="tr">อัตรา%</th></tr></thead>
+          <table><thead><tr><th>Zone</th><th>Regional</th><th>จำนวนสาขา</th><th class="tr">BUDGET</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th class="tr">อัตรา%</th></tr></thead>
           <tbody id="tbl-zone"></tbody></table>
         </div>
       </div>
@@ -551,7 +551,7 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
       <div class="card">
         <div class="card-hd"><span class="card-title">ตารางสรุปตามสาขา</span></div>
         <div class="tbl-wrap">
-          <table><thead><tr><th>เลขสาขา</th><th>ชื่อสาขา</th><th>Zone</th><th>Regional</th><th class="tr">Budget</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th class="tr">อัตรา%</th></tr></thead>
+          <table><thead><tr><th>เลขสาขา</th><th>ชื่อสาขา</th><th>Zone</th><th>Regional</th><th class="tr">BUDGET</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th class="tr">อัตรา%</th></tr></thead>
           <tbody id="tbl-branch"></tbody></table>
         </div>
       </div>
@@ -778,7 +778,7 @@ function renderWFTable() {
   const secs = [...new Set(wfRows.map(r=>r.sec))];
   let html = '<div class="wf-row" style="grid-template-columns:'+COLS+';background:#F8FAFC;border-bottom:1px solid var(--bdr)">'
     +'<div class="wf-cell" style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px">ประเภทกำลังคน</div>'
-    +'<div class="wf-cell tr" style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase">Budget</div>'
+    +'<div class="wf-cell tr" style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase">BUDGET</div>'
     +'<div class="wf-cell tr" style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase">ACTUAL</div>'
     +'<div class="wf-cell tr" style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase">ขาด/เกิน</div>'
     +'<div class="wf-cell" style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase">หมายเหตุ</div>'
@@ -950,10 +950,10 @@ function exportXL() {
   const f = records.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to));
   if (!f.length) { toast('ไม่มีข้อมูล','err'); return; }
   const wb = XLSX.utils.book_new();
-  const sumH = ['วันที่','ช่วงเวลา','เลขสาขา','ชื่อสาขา','Zone','Regional','ผู้ตรวจสอบ','Budget','ACTUAL','ขาด/เกิน','อัตรา%'];
+  const sumH = ['วันที่','ช่วงเวลา','เลขสาขา','ชื่อสาขา','Zone','Regional','ผู้ตรวจสอบ','BUDGET','ACTUAL','ขาด/เกิน','อัตรา%'];
   const sumD = [sumH, ...f.map(r=>[fmtDateXL(r.date),r.time,r.branchNum,r.branchName,r.zone,r.regional,r.manager,r.totalPlan,r.totalActual,r.diff,r.totalPlan?Math.round(r.totalActual/r.totalPlan*100):0])];
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sumD),'สรุปกำลังคน');
-  const detH = ['วันที่','ช่วงเวลา','เลขสาขา','ชื่อสาขา','Zone','Regional','หมวด','ประเภท','Budget','ACTUAL','ขาด/เกิน','หมายเหตุ'];
+  const detH = ['วันที่','ช่วงเวลา','เลขสาขา','ชื่อสาขา','Zone','Regional','หมวด','ประเภท','BUDGET','ACTUAL','ขาด/เกิน','หมายเหตุ'];
   const detD = [detH];
   f.forEach(r=>r.rows.forEach(row=>detD.push([fmtDateXL(r.date),r.time,r.branchNum,r.branchName,r.zone,r.regional,row.sec,row.label,row.plan||0,row.actual||0,(row.actual||0)-(row.plan||0),row.remark||''])));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(detD),'รายละเอียด');
@@ -1003,7 +1003,7 @@ function drawRegional(f) {
   if (chReg) chReg.destroy();
   chReg = new Chart(document.getElementById('ch-regional'), {
     type:'bar', plugins:[topPlugin],
-    data:{labels:lbl,datasets:[{label:'Budget',data:plan,backgroundColor:'#93C5FD',borderRadius:4},{label:'ACTUAL',data:actual,backgroundColor:'#1d4ed8',borderRadius:4}]},
+    data:{labels:lbl,datasets:[{label:'BUDGET',data:plan,backgroundColor:'#93C5FD',borderRadius:4},{label:'ACTUAL',data:actual,backgroundColor:'#1d4ed8',borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{display:true,position:'top',labels:{font:{family:'Sarabun,sans-serif',size:12},boxWidth:12,boxHeight:12}}},scales:{x:{ticks:{font:{family:'Sarabun,sans-serif'}}},y:{ticks:{font:{family:'Sarabun,sans-serif'}}}}}
   });
 
@@ -1038,7 +1038,7 @@ function drawZone(f) {
   if (chZone) chZone.destroy();
   chZone = new Chart(document.getElementById('ch-zone'), {
     type:'bar', plugins:[topPlugin],
-    data:{labels:lbl,datasets:[{label:'Budget',data:plan,backgroundColor:'#93C5FD',borderRadius:4},{label:'ACTUAL',data:actual,backgroundColor:'#1d4ed8',borderRadius:4}]},
+    data:{labels:lbl,datasets:[{label:'BUDGET',data:plan,backgroundColor:'#93C5FD',borderRadius:4},{label:'ACTUAL',data:actual,backgroundColor:'#1d4ed8',borderRadius:4}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:50}},plugins:{legend:{display:true,position:'top',labels:{font:{family:'Sarabun,sans-serif',size:12},boxWidth:12,boxHeight:12}}},scales:{x:{ticks:{font:{family:'Sarabun,sans-serif'}}},y:{ticks:{font:{family:'Sarabun,sans-serif'}}}}}
   });
 }
@@ -1083,7 +1083,7 @@ function drawBranchChart(f, bNum) {
 
   document.getElementById('br-info').innerHTML =
     '<div style="background:#EFF6FF;border-radius:8px;padding:10px 14px;flex:1;min-width:130px"><div style="font-size:11px;color:#2563eb;font-weight:700;text-transform:uppercase">สาขา</div><div style="font-size:15px;font-weight:700;color:#2563eb">'+b.branchNum+'</div><div style="font-size:11px;color:#6B7280">'+b.branchName.replace('บมจ.ซีพี แอ็กซ์ตร้า สาขา','')+'</div></div>'+
-    '<div style="background:#ECFDF5;border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:#059669;font-weight:700;text-transform:uppercase">Budget</div><div style="font-size:22px;font-weight:700;color:#059669">'+tp+'</div><div style="font-size:11px;color:#6B7280">คน</div></div>'+
+    '<div style="background:#ECFDF5;border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:#059669;font-weight:700;text-transform:uppercase">BUDGET</div><div style="font-size:22px;font-weight:700;color:#059669">'+tp+'</div><div style="font-size:11px;color:#6B7280">คน</div></div>'+
     '<div style="background:#EFF6FF;border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:#1d4ed8;font-weight:700;text-transform:uppercase">ACTUAL</div><div style="font-size:22px;font-weight:700;color:#1d4ed8">'+ta+'</div><div style="font-size:11px;color:#6B7280">คน</div></div>'+
     '<div style="background:'+dbg+';border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:'+dc+';font-weight:700;text-transform:uppercase">ขาด/เกิน</div><div style="font-size:22px;font-weight:700;color:'+dc+'">'+(diff>0?'+'+diff:diff)+'</div><div style="font-size:11px;color:#6B7280">คน</div></div>'+
     '<div style="background:#FFFBEB;border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:#D97706;font-weight:700;text-transform:uppercase">อัตรา</div><div style="font-size:22px;font-weight:700;color:'+rc+'">'+rate+'%</div><div style="font-size:11px;color:#6B7280">% มาทำงาน</div></div>';
@@ -1131,7 +1131,7 @@ function drawBranchChart(f, bNum) {
   if (chBranch) chBranch.destroy();
   chBranch = new Chart(document.getElementById('ch-branch'), {
     type:'bar', plugins:[topPlugin],
-    data:{labels:rowLabels,datasets:[{label:'Budget',data:planVals,backgroundColor:'#93C5FD',borderRadius:4},{label:'ACTUAL',data:actualVals,backgroundColor:'#1d4ed8',borderRadius:4}]},
+    data:{labels:rowLabels,datasets:[{label:'BUDGET',data:planVals,backgroundColor:'#93C5FD',borderRadius:4},{label:'ACTUAL',data:actualVals,backgroundColor:'#1d4ed8',borderRadius:4}]},
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:40}},plugins:{legend:{display:true,position:'top',labels:{font:{family:'Sarabun,sans-serif',size:12},boxWidth:12,boxHeight:12}}},scales:{x:{ticks:{font:{family:'Sarabun,sans-serif',size:11},maxRotation:30}},y:{beginAtZero:true,ticks:{font:{family:'Sarabun,sans-serif'}}}}}
   });
 }
