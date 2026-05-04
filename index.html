@@ -950,7 +950,7 @@ function exportXL() {
   const f = records.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to));
   if (!f.length) { toast('ไม่มีข้อมูล','err'); return; }
   const wb = XLSX.utils.book_new();
-  const sumH = ['วันที่','ช่วงเวลา','เลขสาขา','ชื่อสาขา','Zone','Regional','ผู้จัดการ','แผน','มาทำงาน','ขาด/เกิน','อัตรา%'];
+  const sumH = ['วันที่','ช่วงเวลา','เลขสาขา','ชื่อสาขา','Zone','Regional','ผู้ตรวจสอบ','แผน','มาทำงาน','ขาด/เกิน','อัตรา%'];
   const sumD = [sumH, ...f.map(r=>[fmtDateXL(r.date),r.time,r.branchNum,r.branchName,r.zone,r.regional,r.manager,r.totalPlan,r.totalActual,r.diff,r.totalPlan?Math.round(r.totalActual/r.totalPlan*100):0])];
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sumD),'สรุปกำลังคน');
   const detH = ['วันที่','ช่วงเวลา','เลขสาขา','ชื่อสาขา','Zone','Regional','หมวด','ประเภท','แผน','มาทำงาน','ขาด/เกิน','หมายเหตุ'];
