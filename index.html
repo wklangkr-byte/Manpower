@@ -2,12 +2,12 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#1e3a8a">
-<title>ระบบสำรวจกำลังคนประจำวัน — Store Operations Audit</title>
+<meta name="theme-color" content="#1e40af">
+<title>ระบบสำรวจกำลังคนสาขา — STORE MANPOWER</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -329,316 +329,279 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
 }
 .logout-modal-foot .btn{flex:1;justify-content:center;font-size:13.5px;padding:10px}
 
-/* =============================================
-   RESPONSIVE / MOBILE-FIRST ADAPTIVE LAYOUT
-   Breakpoints:
-   - Mobile  : ≤ 600px
-   - Tablet  : 601–1024px
-   - Desktop : ≥ 1025px
-   iOS/Android safe-area support included
-   ============================================= */
+/* ========================================================
+   RESPONSIVE — Mobile / Tablet / PC / iOS / Android
+   ======================================================== */
 
-/* --- Hamburger toggle button (hidden on desktop) --- */
-.sb-toggle{
-  display:none;position:fixed;top:14px;left:14px;z-index:300;
-  width:40px;height:40px;border-radius:10px;
-  background:linear-gradient(135deg,#1e3a8a,#2563eb);
-  border:none;cursor:pointer;align-items:center;justify-content:center;
-  box-shadow:0 4px 12px rgba(30,58,138,.35);
-  -webkit-tap-highlight-color:transparent
-}
-.sb-toggle svg{width:22px;height:22px;color:#fff}
+/* Viewport meta already set — ensure no tap highlight on iOS */
+* { -webkit-tap-highlight-color: transparent; }
+input, select, textarea, button { touch-action: manipulation; }
+/* Prevent iOS font-size bump on focus */
+input, select, textarea { font-size: max(16px, 1em); }
 
-/* --- Sidebar overlay backdrop (mobile) --- */
-.sb-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
-  z-index:99;opacity:0;pointer-events:none;transition:opacity .25s
+/* ─── Hamburger toggle button (hidden on PC) ─────────── */
+#sb-toggle {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: var(--r2);
+  background: transparent; border: 1px solid var(--bdr);
+  cursor: pointer; flex-shrink: 0;
 }
-.sb-overlay.open{opacity:1;pointer-events:all}
+#sb-toggle svg { width: 20px; height: 20px; color: var(--tx); }
 
-/* --- Bottom Navigation Bar (mobile only) --- */
-.bottom-nav{
-  display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;
-  background:#fff;border-top:1px solid var(--bdr);
-  padding:6px 0 max(6px,env(safe-area-inset-bottom));
-  box-shadow:0 -4px 16px rgba(0,0,0,.08)
+/* Sidebar overlay backdrop (mobile) */
+#sb-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.45); z-index: 99;
 }
-.bottom-nav-inner{display:flex;align-items:center;justify-content:space-around}
-.bnav-item{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:6px 10px;border-radius:10px;cursor:pointer;
-  color:var(--tx2);font-size:10px;font-weight:500;
-  transition:all .15s;border:none;background:none;
-  font-family:var(--font);-webkit-tap-highlight-color:transparent;
-  min-width:60px
-}
-.bnav-item svg{width:22px;height:22px;opacity:.6}
-.bnav-item.active{color:var(--accent)}
-.bnav-item.active svg{opacity:1}
+#sb-backdrop.open { display: block; }
 
-/* =============================================
-   TABLET  601–1024px
-   ============================================= */
-@media (max-width:1024px) and (min-width:601px) {
-  .sb{width:220px}
-  .main{margin-left:220px}
-  .topbar{padding:0 20px}
-  .page{padding:20px}
-  .g4{grid-template-columns:repeat(2,1fr)}
-  .g2{grid-template-columns:1fr}
-  .login-box{padding:36px 36px;width:380px}
-  /* WF table column adjust */
-  .wf-row{overflow-x:auto}
+/* ─── PC / Large Desktop ≥ 1280px ─────────────────────── */
+@media (min-width: 1280px) {
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .page { padding: 32px; }
+  .bgrid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
 }
 
-/* =============================================
-   TABLET SMALL / LARGE PHONE  ≤768px
-   ============================================= */
-@media (max-width:768px) {
-  /* Show hamburger, hide sidebar */
-  .sb-toggle{display:flex}
-  .sb{
-    transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
-    width:260px;z-index:200
+/* ─── Tablet Landscape / Small Desktop 1024–1279px ─────── */
+@media (max-width: 1279px) and (min-width: 1024px) {
+  .sb { width: 220px; }
+  .main { margin-left: 220px; }
+  .g4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .bgrid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+
+/* ─── Tablet Portrait 768–1023px ─────────────────────── */
+@media (max-width: 1023px) and (min-width: 768px) {
+  /* Sidebar becomes slide-in drawer */
+  .sb {
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
   }
-  .sb.open{transform:translateX(0)}
-  .sb-overlay{display:block}
+  .sb.open { transform: translateX(0); }
+  .main { margin-left: 0; }
 
-  /* Main fills full width */
-  .main{margin-left:0}
+  #sb-toggle { display: flex; }
 
-  /* Topbar adjustments */
-  .topbar{
-    padding:0 16px 0 62px;height:56px;
-    padding-left:max(62px,calc(env(safe-area-inset-left) + 62px))
-  }
-  .topbar-title{font-size:14px}
-  #today-lbl{display:none}
-  #fb-status{font-size:11px}
+  .page { padding: 20px; }
+  .g4 { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .g2 { grid-template-columns: 1fr; gap: 12px; }
+  .stat-val { font-size: 22px; }
 
-  /* Pages */
-  .page{padding:14px}
+  .topbar { padding: 0 16px; gap: 8px; }
+  .topbar-title { font-size: 14px; }
+  #today-lbl { display: none; }
 
-  /* Stat grid */
-  .g4{grid-template-columns:repeat(2,1fr);gap:10px}
-  .g2{grid-template-columns:1fr;gap:12px}
-  .stat-val{font-size:22px}
+  /* Branch grid */
+  .bgrid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); max-height: 220px; }
 
-  /* Cards */
-  .card-hd{flex-wrap:wrap;gap:8px;padding:12px 14px 10px}
-  .card-body{padding:12px 14px}
-
-  /* Branch selector */
-  .bsel{padding:14px}
-  .bgrid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
-  .bc{padding:9px 11px}
-  .bc .ln{font-size:16px}
-
-  /* Step 2 branch info */
-  #step2 .flex.ic.g12{flex-direction:column;align-items:stretch}
-  #step2 .card{min-width:unset}
-
-  /* WF Table — horizontal scroll, smaller inputs */
-  .wf-row{min-width:500px}
-  #wf-container{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  input.ie{width:60px;font-size:12px}
-  .wf-cell{padding:7px 10px;font-size:12px}
-
-  /* History table */
-  .tbl-wrap{-webkit-overflow-scrolling:touch}
-
-  /* Dashboard filters */
-  .flex.g8.mb16{gap:8px}
-  .tab-list{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
-
-  /* Topbar user badge */
-  .user-badge span:not(.user-avatar){display:none}
-  .user-badge{padding:6px 8px}
+  /* History filters: wrap nicely */
+  #page-history .flex, #page-dashboard .flex { flex-wrap: wrap; }
+  #h-from, #h-to, #h-regional, #h-zone, #h-branch { width: 140px !important; }
 
   /* Login box */
-  .login-box{padding:32px 28px;width:calc(100vw - 40px);max-width:420px}
+  .login-box { padding: 32px 28px; width: 360px; }
 
-  /* Modal full-width on mobile */
-  .modal{width:calc(100vw - 32px);max-width:unset}
-
-  /* Charts full height */
-  [style*="height:260px"]{height:220px !important}
-  [style*="height:320px"]{height:280px !important}
+  /* WF table inputs */
+  input.ie { width: 60px; }
 }
 
-/* =============================================
-   MOBILE  ≤600px  —  Bottom Navigation mode
-   ============================================= */
-@media (max-width:600px) {
-  /* Show bottom nav, hide sidebar entirely */
-  .sb{display:none !important}
-  .sb-overlay{display:none !important}
-  .sb-toggle{display:none !important}
-  .bottom-nav{display:block}
-  .main{
-    margin-left:0;
-    padding-bottom:calc(64px + env(safe-area-inset-bottom))
+/* ─── Mobile Large 480–767px ─────────────────────────── */
+@media (max-width: 767px) and (min-width: 480px) {
+  .sb {
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+  }
+  .sb.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  #sb-toggle { display: flex; }
+
+  .page { padding: 14px; }
+  .g4 { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .g2 { grid-template-columns: 1fr; gap: 10px; }
+  .stat-val { font-size: 20px; }
+  .stat { padding: 12px 14px; }
+
+  .topbar { padding: 0 12px; height: 54px; }
+  .topbar-title { font-size: 13px; }
+  #today-lbl { display: none; }
+  #fb-status { display: none; }
+  #user-name-lbl { display: none; }
+
+  .card-hd { flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+  .card-body { padding: 12px 14px; }
+
+  /* Branch selector filters: stack */
+  .bsel { padding: 14px; }
+  .bsel .flex.g12 { flex-direction: column; gap: 8px; }
+  #b-search, #b-regional, #b-zone { max-width: 100% !important; width: 100% !important; }
+  #rec-date, #rec-time { width: 100% !important; max-width: 100% !important; }
+  .bsel .flex.ic.g8 { width: 100%; }
+  .bgrid { grid-template-columns: repeat(2, 1fr); max-height: 200px; }
+
+  /* Step 2 action buttons */
+  #step2 > .flex { flex-direction: column; align-items: stretch !important; }
+  #btn-change, #btn-save { width: 100%; justify-content: center; }
+
+  /* WF table: compact */
+  .wf-cell { padding: 6px 8px; font-size: 12px; }
+  input.ie { width: 52px; font-size: 12px; }
+  input.le { font-size: 12px; }
+
+  /* History page */
+  #page-history .flex { flex-direction: column; align-items: stretch; }
+  #h-from, #h-to, #h-regional, #h-zone, #h-branch, #btn-export { width: 100% !important; }
+  #btn-export { margin-left: 0 !important; }
+
+  /* Dashboard filter row */
+  #page-dashboard > .flex { flex-direction: column; align-items: stretch; }
+  #d-from, #d-to, #btn-d-filter { width: 100% !important; }
+
+  /* Tab buttons: scroll horizontally */
+  .tab-list { overflow-x: auto; width: 100%; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+  .tab-btn { white-space: nowrap; flex-shrink: 0; }
+
+  /* Login box */
+  .login-box { padding: 28px 20px; width: calc(100vw - 32px); border-radius: 16px; }
+  .login-logo h1 { font-size: 18px; }
+  .login-logo .logo-icon { width: 52px; height: 52px; }
+
+  /* Modal */
+  .modal { width: calc(100vw - 24px); }
+  .logout-modal { width: calc(100vw - 24px); }
+
+  /* Charts: reduce height */
+  #page-dashboard .card [style*="height:260px"] { height: 200px !important; }
+
+  /* User badge: icon only */
+  .user-badge { padding: 6px 8px; gap: 4px; }
+}
+
+/* ─── Mobile Small ≤ 479px ──────────────────────────── */
+@media (max-width: 479px) {
+  :root {
+    --r: 10px; --r2: 7px; --r3: 5px;
+    font-size: 13px;
   }
 
-  /* Full-width topbar */
-  .topbar{
-    padding:0 12px;height:52px;
-    padding-left:max(12px,env(safe-area-inset-left));
-    padding-right:max(12px,env(safe-area-inset-right))
+  .sb {
+    width: 100vw; max-width: 280px;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
   }
-  .topbar-title{font-size:13px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  #today-lbl{display:none}
+  .sb.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  #sb-toggle { display: flex; }
 
-  /* Pages */
-  .page{
-    padding:12px;
-    padding-left:max(12px,env(safe-area-inset-left));
-    padding-right:max(12px,env(safe-area-inset-right))
-  }
+  .page { padding: 10px; }
 
-  /* Stat cards: 2 col */
-  .g4{grid-template-columns:repeat(2,1fr);gap:8px}
-  .stat{padding:12px 14px}
-  .stat-val{font-size:20px}
-  .stat-lbl{font-size:10px}
+  /* Stats: 2 columns */
+  .g4 { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .g2 { grid-template-columns: 1fr; gap: 8px; }
+  .stat { padding: 10px 12px; }
+  .stat-val { font-size: 18px; }
+  .stat-lbl { font-size: 10px; }
 
-  /* Grids */
-  .g2{grid-template-columns:1fr;gap:10px}
+  .topbar { padding: 0 10px; height: 50px; }
+  .topbar-title { font-size: 12px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #today-lbl, #fb-status { display: none; }
+  #user-name-lbl { display: none; }
+  .user-avatar { width: 30px; height: 30px; font-size: 10px; }
+  .user-badge { padding: 5px 8px; }
 
-  /* Branch search filters stack vertically */
-  .bsel .flex.g12{flex-direction:column;gap:8px}
-  #b-search,#b-regional,#b-zone{max-width:100% !important;width:100% !important}
-  .bsel .flex.ic.g8{width:100%}
-  #rec-date,#rec-time{width:100% !important;flex:1}
+  .card-hd { flex-wrap: wrap; gap: 6px; padding: 10px 12px; }
+  .card-body { padding: 10px 12px; }
+  .card-title { font-size: 13px; }
 
-  /* Branch grid smaller */
-  .bgrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;max-height:240px}
+  /* Branch selector */
+  .bsel { padding: 10px; margin-bottom: 12px; }
+  .bsel .flex.g12 { flex-direction: column; gap: 6px; }
+  #b-search, #b-regional, #b-zone, #rec-date, #rec-time { max-width: 100% !important; width: 100% !important; }
+  .bsel .flex.ic.g8, .bsel .flex.ic.jb > div:last-child { width: 100%; flex-direction: column; align-items: flex-start !important; }
+  .bgrid { grid-template-columns: 1fr 1fr; max-height: 180px; gap: 6px; }
+  .bc { padding: 8px 10px; }
+  .bc .ln { font-size: 15px; }
+  .bc .lname { font-size: 11px; }
+  .bc .lz { display: none; }
 
-  /* Step 2 actions: stack vertically */
-  #step2 .flex.ic.g12.mb16{flex-direction:column;gap:8px}
-  #btn-save{width:100%;justify-content:center}
-  #btn-change{width:100%;justify-content:center}
+  /* Step 2 */
+  #step2 > .flex { flex-direction: column; align-items: stretch !important; gap: 8px; }
+  #btn-change, #btn-save { width: 100%; justify-content: center; }
+  #step2 .card [style*="flex:1"] { min-width: unset; }
+  #sel-badge { width: 36px !important; height: 36px !important; font-size: 13px !important; }
 
-  /* Card headers stack */
-  .card-hd{flex-wrap:wrap;gap:6px;padding:10px 12px 8px}
-  .card-title{font-size:13px}
+  /* WF table: very compact, allow horizontal scroll */
+  .card:has(#wf-container) { overflow-x: auto; }
+  #wf-container { min-width: 380px; }
+  .wf-cell { padding: 5px 6px; font-size: 11px; }
+  input.ie { width: 46px; font-size: 11px; padding: 3px 4px; }
+  input.le { font-size: 11px; }
+  .wf-sec-hd { font-size: 10px; padding: 5px 10px; }
 
-  /* WF table — horizontal scroll */
-  #wf-container{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px}
-  .wf-row{min-width:480px}
-  input.ie{width:54px;font-size:12px;padding:3px 5px}
-  .wf-cell{padding:6px 8px;font-size:11.5px}
+  /* History filters: all stacked */
+  #page-history .flex { flex-direction: column; align-items: stretch; gap: 6px !important; }
+  #h-from, #h-to, #h-regional, #h-zone, #h-branch, #btn-export,
+  #h-from + .tx2 { width: 100% !important; margin: 0; }
+  #btn-export { margin-left: 0 !important; }
 
-  /* Tab list horizontal scroll */
-  .tab-list{
-    width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;
-    scrollbar-width:none;padding-bottom:2px
-  }
-  .tab-list::-webkit-scrollbar{display:none}
-  .tab-btn{white-space:nowrap;font-size:12px;padding:6px 12px}
+  /* Table: horizontal scroll */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  th, td { font-size: 11px; padding: 8px 10px; white-space: nowrap; }
 
-  /* History filters stack */
-  #page-history .flex.g8.mb16{flex-direction:column;gap:8px;align-items:stretch}
-  #h-from,#h-to,#h-regional,#h-zone,#h-branch{width:100% !important}
-  #btn-export{width:100%;justify-content:center}
-  .tx2[style]{display:none}
-
-  /* Dashboard date filters */
-  #page-dashboard .flex.g8.mb16{flex-wrap:wrap;gap:8px}
-  #d-from,#d-to{flex:1;min-width:120px}
-  #btn-d-filter{flex:1}
-
-  /* Charts shorter */
-  [style*="height:260px"]{height:200px !important}
-  [style*="height:320px"]{height:240px !important}
-
-  /* History table scroll */
-  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px}
-  th,td{font-size:11.5px;padding:8px 10px;white-space:nowrap}
+  /* Dashboard */
+  #page-dashboard > .flex.g8 { flex-direction: column; align-items: stretch; gap: 6px !important; }
+  #d-from, #d-to, #btn-d-filter { width: 100% !important; }
+  .tab-list { overflow-x: auto; width: 100%; flex-wrap: nowrap; padding: 3px; -webkit-overflow-scrolling: touch; }
+  .tab-btn { font-size: 12px; padding: 6px 12px; flex-shrink: 0; }
+  #page-dashboard .g2 { grid-template-columns: 1fr; }
+  #page-dashboard canvas { height: 180px !important; }
+  #page-dashboard [style*="height:260px"] { height: 180px !important; }
+  #page-dashboard [style*="height:320px"] { height: 220px !important; }
+  .d-zone-reg, #d-br-reg, #d-br-zone { width: 100% !important; }
 
   /* Login */
-  .login-box{padding:28px 22px;width:calc(100vw - 32px);border-radius:16px}
-  .login-logo h1{font-size:18px}
-  .login-logo .logo-icon{width:54px;height:54px;border-radius:14px}
-  .login-logo .logo-icon svg{width:26px;height:26px}
+  .login-box { padding: 24px 16px; width: calc(100vw - 24px); border-radius: 14px; }
+  .login-logo { margin-bottom: 20px; }
+  .login-logo h1 { font-size: 16px; }
+  .login-logo p { font-size: 12px; }
+  .login-logo .logo-icon { width: 48px; height: 48px; border-radius: 12px; }
+  .login-logo .logo-icon svg { width: 26px; height: 26px; }
+  .login-btn { font-size: 14px; padding: 12px; }
+  .login-field input { font-size: 16px; padding: 10px 12px; }
 
   /* Modals */
-  .modal{width:calc(100vw - 24px)}
-  .logout-modal{width:calc(100vw - 32px)}
+  .modal { width: calc(100vw - 16px); }
+  .logout-modal { width: calc(100vw - 16px); border-radius: 12px; }
 
   /* Toast */
-  .toast-wrap{bottom:calc(70px + env(safe-area-inset-bottom));right:12px;left:12px}
-  .toast{font-size:12px}
+  .toast-wrap { bottom: 12px; right: 8px; left: 8px; }
+  .toast { font-size: 12px; padding: 9px 13px; }
 
-  /* Branch detail card in step2 */
-  #sel-badge{width:38px;height:38px;font-size:14px}
-
-  /* User badge — just avatar */
-  #user-name-lbl{display:none}
-  .user-badge svg{display:none}
-  .user-badge{padding:5px}
+  /* Buttons */
+  .btn { font-size: 12px; padding: 7px 12px; }
+  .btn-sm { font-size: 11px; padding: 5px 9px; }
 }
 
-/* =============================================
-   VERY SMALL DEVICES  ≤380px  (e.g. iPhone SE)
-   ============================================= */
-@media (max-width:380px) {
-  .g4{grid-template-columns:1fr 1fr}
-  .stat-val{font-size:18px}
-  .bgrid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
-  .page{padding:10px}
-  .login-box{padding:24px 18px}
-}
-
-/* =============================================
-   LARGE DESKTOP  ≥1440px
-   ============================================= */
-@media (min-width:1440px) {
-  .sb{width:280px}
-  .main{margin-left:280px}
-  .page{padding:32px 36px}
-  .g4{grid-template-columns:repeat(4,1fr);gap:18px}
-  .g2{grid-template-columns:repeat(2,1fr);gap:20px}
-}
-
-/* =============================================
-   iOS Safe Area — notch / Dynamic Island
-   ============================================= */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .topbar{
-    padding-top:max(0px, env(safe-area-inset-top));
-    height:calc(60px + env(safe-area-inset-top))
+/* ─── Safe area insets for notch devices (iOS/Android) ─── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .sb { padding-bottom: env(safe-area-inset-bottom); }
+  .toast-wrap { bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .topbar {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
   }
-  @media (max-width:600px){
-    .topbar{height:calc(52px + env(safe-area-inset-top));align-items:flex-end;padding-bottom:10px}
-  }
+  body { padding-top: env(safe-area-inset-top); }
 }
 
-/* =============================================
-   Touch UX improvements
-   ============================================= */
-@media (hover:none) and (pointer:coarse) {
-  /* Larger tap targets */
-  .btn{min-height:42px}
-  .form-control{min-height:40px;font-size:16px} /* prevent iOS zoom on input focus */
-  .nav-item{padding:11px 12px}
-  .bc{padding:12px 13px}
-  input.ie{min-height:38px;font-size:16px}
-  input.le{min-height:30px}
-  select.form-control{font-size:16px} /* prevent iOS zoom */
-  /* Remove hover effects on touch */
-  .nav-item:hover{background:unset;color:rgba(255,255,255,.6)}
-  .nav-item.active:hover{background:rgba(255,255,255,.15);color:#fff}
-  .bc:hover{border-color:var(--bdr);background:#fff}
-}
-
-/* =============================================
-   Print / wide display tweak
-   ============================================= */
+/* ─── Print: hide sidebar & controls ─────────────────── */
 @media print {
-  .sb,.topbar,.bottom-nav,.sb-toggle,.btn-logout,.toast-wrap{display:none !important}
-  .main{margin:0;padding:0}
-  .page.active{display:block !important;padding:0}
+  .sb, .topbar, .bsel, #sb-toggle, #sb-backdrop, .toast-wrap,
+  .btn, .tab-list, #page-history .flex:first-child { display: none !important; }
+  .main { margin-left: 0; }
+  .page { padding: 16px; }
 }
 </style>
 </head>
@@ -652,8 +615,8 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
       </div>
-      <h1>Store Operations Audit</h1>
-      <p>ระบบสำรวจกำลังคนประจำวัน</p>
+      <h1>STORE MANPOWER</h1>
+      <p>ระบบสำรวจกำลังคนสาขา</p>
     </div>
 
     <div class="login-err" id="login-err">
@@ -683,29 +646,20 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
     </button>
 
     <div class="login-footer">
-      Store Operations Audit Man-Power Survey System v2.0
+      STORE MANPOWER Man-Power Survey System v2.0
     </div>
   </div>
 </div>
 <!-- secret trigger corner -->
 <div id="secret-trigger" title=""></div>
 
-<!-- Hamburger toggle (tablet only) -->
-<button class="sb-toggle" id="sb-toggle" aria-label="เปิด/ปิดเมนู">
-  <svg id="sb-toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-  </svg>
-</button>
-<!-- Sidebar overlay backdrop -->
-<div class="sb-overlay" id="sb-overlay"></div>
-
 <div class="shell">
 
 <!-- SIDEBAR -->
 <aside class="sb">
   <div class="sb-logo">
-    <div class="brand">Store Operations Audit</div>
-    <div class="sub">ระบบสำรวจกำลังคนประจำวัน</div>
+    <div class="brand">STORE MANPOWER</div>
+    <div class="sub">ระบบสำรวจกำลังคนสาขา</div>
   </div>
   <div class="sb-sec">
     <div class="sb-lbl">เมนูหลัก</div>
@@ -742,6 +696,11 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
 
 <div class="main">
   <div class="topbar">
+    <button id="sb-toggle" aria-label="เปิด/ปิดเมนู" onclick="toggleSidebar()">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
     <span class="topbar-title" id="topbar-title">บันทึกกำลังคนประจำวัน</span>
     <div style="display:flex;align-items:center;gap:16px">
       <span id="fb-status" style="font-size:12px;font-weight:500">🔄 กำลังเชื่อมต่อ...</span>
@@ -845,7 +804,7 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>วันที่</th><th>ช่วงเวลา</th><th>เลขสาขา</th><th>ชื่อสาขา</th><th>Zone</th><th>Regional</th><th class="tr">BUDGET</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th></th></tr></thead>
+          <thead><tr><th>วันที่</th><th>ช่วงเวลา</th><th>เลขสาขา</th><th>ชื่อสาขา</th><th>Zone</th><th>Regional</th><th class="tr">BUDGET</th><th class="tr">ACTUAL</th><th class="tr">ขาด/เกิน</th><th class="tr">อัตรา%</th><th></th></tr></thead>
           <tbody id="h-tbody"></tbody>
         </table>
         <div class="empty" id="h-empty" style="display:none">
@@ -958,31 +917,10 @@ input.le:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px r
 </div>
 </div>
 
-<div class="toast-wrap" id="toasts"></div>
+<!-- Sidebar backdrop for mobile -->
+<div id="sb-backdrop" onclick="closeSidebar()"></div>
 
-<!-- Bottom Navigation Bar (mobile ≤600px) -->
-<nav class="bottom-nav" id="bottom-nav" aria-label="Bottom navigation">
-  <div class="bottom-nav-inner">
-    <button class="bnav-item active" data-page="record" id="bnav-record">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-      </svg>
-      บันทึก
-    </button>
-    <button class="bnav-item" data-page="history" id="bnav-history">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-      ประวัติ
-    </button>
-    <button class="bnav-item" data-page="dashboard" id="bnav-dashboard">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-      </svg>
-      Dashboard
-    </button>
-  </div>
-</nav>
+<div class="toast-wrap" id="toasts"></div>
 
 <div class="modal-bg" id="modal-del">
   <div class="modal">
@@ -1028,7 +966,11 @@ const WF_TEMPLATE = [
   {sec:"Fresh Food",id:"frozen",label:"Frozen & Dairy",plan:0,actual:0,remark:""},
   {sec:"Dry Food",id:"dry",label:"Total : Dry Food",plan:0,actual:0,remark:""},
   {sec:"Non Food",id:"nf",label:"Total : Non Food",plan:0,actual:0,remark:""},
-  {sec:"Operations",id:"o2o",label:"O2O",plan:0,actual:0,remark:""},
+  {sec:"Operations",id:"o2o_picker",label:"Picker / Packer",plan:0,actual:0,remark:"",isO2OSub:true},
+  {sec:"Operations",id:"o2o_loader",label:"Loader",plan:0,actual:0,remark:"",isO2OSub:true},
+  {sec:"Operations",id:"o2o_driver",label:"Driver",plan:0,actual:0,remark:"",isO2OSub:true},
+  {sec:"Operations",id:"o2o_admin",label:"Admin O2O",plan:0,actual:0,remark:"",isO2OSub:true},
+  {sec:"Operations",id:"o2o",label:"Total : O2O",plan:0,actual:0,remark:"",isO2OTotal:true},
   {sec:"Operations",id:"gr",label:"GR",plan:0,actual:0,remark:""},
   {sec:"Operations",id:"ga",label:"GA",plan:0,actual:0,remark:""},
   {sec:"Operations",id:"cs",label:"CS (Cashier)",plan:0,actual:0,remark:""},
@@ -1236,18 +1178,37 @@ function renderWFTable() {
       const diff = (row.actual||0)-(row.plan||0);
       const dc = diff<0?'diff-n':diff>0?'diff-p':'diff-z';
       const dt = diff>0?'+'+diff:diff;
-      html += '<div class="wf-row" style="grid-template-columns:'+COLS+'">'
-        +'<div class="wf-cell"><input class="le" value="'+esc(row.label)+'" data-f="label" data-i="'+idx+'"></div>'
-        +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-f="plan" data-i="'+idx+'"></div>'
-        +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-f="actual" data-i="'+idx+'"></div>'
-        +'<div class="wf-cell tr '+dc+'" id="d'+idx+'">'+dt+'</div>'
-        +'<div class="wf-cell"><input class="le" value="'+esc(row.remark)+'" data-f="remark" data-i="'+idx+'" placeholder="หมายเหตุ..."></div>'
-        +'</div>';
+
+      if (row.isO2OTotal) {
+        html += '<div class="wf-row wf-total" style="grid-template-columns:'+COLS+';background:#FFF9C4;border-top:2px solid #F9A825">'
+          +'<div class="wf-cell fw6" style="color:#5D4037">'+esc(row.label)+'</div>'
+          +'<div class="wf-cell tr fw6" id="o2o-tp">'+(row.plan||0)+'</div>'
+          +'<div class="wf-cell tr fw6" id="o2o-ta">'+(row.actual||0)+'</div>'
+          +'<div class="wf-cell tr fw6 '+dc+'" id="d'+idx+'">'+dt+'</div>'
+          +'<div class="wf-cell"></div>'
+          +'</div>';
+      } else if (row.isO2OSub) {
+        html += '<div class="wf-row" style="grid-template-columns:'+COLS+';background:#FFFDE7">'
+          +'<div class="wf-cell"><input class="le" value="'+esc(row.label)+'" data-f="label" data-i="'+idx+'" style="color:#E65100;font-weight:500"></div>'
+          +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-f="plan" data-i="'+idx+'" style="border-color:#F9A825"></div>'
+          +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-f="actual" data-i="'+idx+'" style="border-color:#F9A825"></div>'
+          +'<div class="wf-cell tr '+dc+'" id="d'+idx+'">'+dt+'</div>'
+          +'<div class="wf-cell"><input class="le" value="'+esc(row.remark)+'" data-f="remark" data-i="'+idx+'" placeholder="หมายเหตุ..."></div>'
+          +'</div>';
+      } else {
+        html += '<div class="wf-row" style="grid-template-columns:'+COLS+'">'
+          +'<div class="wf-cell"><input class="le" value="'+esc(row.label)+'" data-f="label" data-i="'+idx+'"></div>'
+          +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-f="plan" data-i="'+idx+'"></div>'
+          +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-f="actual" data-i="'+idx+'"></div>'
+          +'<div class="wf-cell tr '+dc+'" id="d'+idx+'">'+dt+'</div>'
+          +'<div class="wf-cell"><input class="le" value="'+esc(row.remark)+'" data-f="remark" data-i="'+idx+'" placeholder="หมายเหตุ..."></div>'
+          +'</div>';
+      }
     });
   });
 
-  const tp = wfRows.reduce((s,r)=>s+(+r.plan||0),0);
-  const ta = wfRows.reduce((s,r)=>s+(+r.actual||0),0);
+  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.plan||0)),0);
+  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.actual||0)),0);
   const td = ta-tp;
   const tdc = td<0?'diff-n':td>0?'diff-p':'diff-z';
   html += '<div class="wf-row wf-total" style="grid-template-columns:'+COLS+'">'
@@ -1259,6 +1220,7 @@ function renderWFTable() {
     +'</div>';
 
   con.innerHTML = html;
+  updO2OTotal();
 
   con.querySelectorAll('input[data-f]').forEach(inp => {
     inp.addEventListener('input', () => {
@@ -1278,11 +1240,36 @@ function updDiff(idx) {
   const diff = (wfRows[idx].actual||0)-(wfRows[idx].plan||0);
   el.textContent = diff>0?'+'+diff:diff;
   el.className = 'wf-cell tr '+(diff<0?'diff-n':diff>0?'diff-p':'diff-z');
+  // If editing an O2O sub-row, update Total O2O
+  if (wfRows[idx].isO2OSub) updO2OTotal();
+}
+
+function updO2OTotal() {
+  // Sum all O2O sub rows
+  const subs = wfRows.filter(r=>r.isO2OSub);
+  const totRow = wfRows.find(r=>r.isO2OTotal);
+  if (!totRow) return;
+  const sp = subs.reduce((s,r)=>s+(+r.plan||0),0);
+  const sa = subs.reduce((s,r)=>s+(+r.actual||0),0);
+  totRow.plan = sp;
+  totRow.actual = sa;
+  const elTp = document.getElementById('o2o-tp');
+  const elTa = document.getElementById('o2o-ta');
+  if (elTp) elTp.textContent = sp;
+  if (elTa) elTa.textContent = sa;
+  const diff = sa - sp;
+  const totIdx = wfRows.indexOf(totRow);
+  const elD = document.getElementById('d'+totIdx);
+  if (elD) {
+    elD.textContent = diff>0?'+'+diff:diff;
+    elD.className = 'wf-cell tr fw6 '+(diff<0?'diff-n':diff>0?'diff-p':'diff-z');
+  }
 }
 
 function updTotals() {
-  const tp = wfRows.reduce((s,r)=>s+(+r.plan||0),0);
-  const ta = wfRows.reduce((s,r)=>s+(+r.actual||0),0);
+  // Grand total excludes O2O sub-rows (use Total O2O instead to avoid double count)
+  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.plan||0)),0);
+  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.actual||0)),0);
   const td = ta-tp;
   document.getElementById('tp').textContent = tp;
   document.getElementById('ta').textContent = ta;
@@ -1300,8 +1287,9 @@ function saveRecord() {
   const date = document.getElementById('rec-date').value;
   const time = document.getElementById('rec-time').value;
   if (!date) { toast('กรุณาเลือกวันที่','err'); return; }
-  const tp = wfRows.reduce((s,r)=>s+(+r.plan||0),0);
-  const ta = wfRows.reduce((s,r)=>s+(+r.actual||0),0);
+  // Exclude O2O sub-rows from grand total (O2O Total row already sums them)
+  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.plan||0)),0);
+  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.actual||0)),0);
   const rec = {
     id: Date.now(), date, time,
     branchNum: selBranch.num, branchName: selBranch.name,
@@ -1349,15 +1337,84 @@ function renderHistory() {
   const empty = document.getElementById('h-empty');
   if (!f.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display = 'none';
-  tbody.innerHTML = f.map(r => {
+  let rows = '';
+  f.forEach(r => {
     const dc = r.diff<0?'tc-err':r.diff>0?'tc-ok':'';
     const dt = r.diff>0?'+'+r.diff:r.diff;
-    return '<tr><td>'+fmtDate(r.date)+'</td><td><span class="chip c-info">'+r.time+'</span></td><td class="fw6">'+r.branchNum+'</td>'
-      +'<td>'+r.branchName.replace('บมจ.ซีพี แอ็กซ์ตร้า สาขา','')+'</td><td>'+r.zone+'</td><td>'+r.regional+'</td>'
-      +'<td class="tr">'+r.totalPlan+'</td><td class="tr">'+r.totalActual+'</td>'
-      +'<td class="tr '+dc+'">'+dt+'</td>'
-      +(currentUser && currentUser.role==='admin' ? '<td><button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err)" onclick="askDel('+r.id+')">ลบ</button></td>' : '<td></td>')+'</tr>';
-  }).join('');
+    const rate = r.totalPlan ? (r.totalActual/r.totalPlan*100).toFixed(1)+'%' : '—';
+    const rid = 'row-'+r.id;
+    // Main summary row
+    rows += '<tr style="cursor:pointer" onclick="toggleDetail(\''+rid+'\')">';
+    rows += '<td><span style="font-size:10px;color:var(--tx3);margin-right:4px" id="arr-'+rid+'">▶</span>'+fmtDate(r.date)+'</td>';
+    rows += '<td><span class="chip c-info">'+r.time+'</span></td>';
+    rows += '<td class="fw6">'+r.branchNum+'</td>';
+    rows += '<td>'+r.branchName.replace('บมจ.ซีพี แอ็กซ์ตร้า สาขา','')+'</td>';
+    rows += '<td>'+r.zone+'</td><td>'+r.regional+'</td>';
+    rows += '<td class="tr">'+(r.totalPlan||0).toLocaleString()+'</td>';
+    rows += '<td class="tr">'+(r.totalActual||0).toLocaleString()+'</td>';
+    rows += '<td class="tr '+dc+'">'+dt+'</td>';
+    rows += '<td class="tr">'+rate+'</td>';
+    rows += (currentUser && currentUser.role==='admin'
+      ? '<td><button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err)" onclick="event.stopPropagation();askDel('+r.id+')">ลบ</button></td>'
+      : '<td></td>');
+    rows += '</tr>';
+    // Detail expand row
+    rows += '<tr id="'+rid+'" style="display:none"><td colspan="11" style="padding:0;background:#F8FAFF">';
+    rows += '<div style="padding:12px 18px">';
+    if (true) { // always build detail
+      rows += '<table style="width:100%;border-collapse:collapse;font-size:12.5px">';
+      rows += '<thead><tr style="background:#EEF2FF">';
+      rows += '<th style="padding:6px 12px;text-align:left;font-weight:700;color:#3730a3;font-size:11px">ประเภทกำลังคน</th>';
+      rows += '<th style="padding:6px 12px;text-align:right;font-weight:700;color:#3730a3;font-size:11px">BUDGET</th>';
+      rows += '<th style="padding:6px 12px;text-align:right;font-weight:700;color:#3730a3;font-size:11px">ACTUAL</th>';
+      rows += '<th style="padding:6px 12px;text-align:right;font-weight:700;color:#3730a3;font-size:11px">ขาด/เกิน</th>';
+      rows += '<th style="padding:6px 12px;text-align:left;font-weight:700;color:#3730a3;font-size:11px">หมายเหตุ</th>';
+      rows += '</tr></thead><tbody>';
+    }
+    if (r.rows && r.rows.length) {
+      const secs2 = [...new Set(r.rows.map(rw=>rw.sec))];
+      secs2.forEach(sec => {
+        rows += '<tr><td colspan="5" style="padding:3px 12px;background:#F1F5F9;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.5px">'+sec+'</td></tr>';
+        r.rows.filter(rw=>rw.sec===sec).forEach(rw => {
+          const d2=(rw.actual||0)-(rw.plan||0);
+          const dc2=d2<0?'#DC2626':d2>0?'#059669':'#9CA3AF';
+          const bg=rw.isO2OTotal?'background:#FFF9C4;':'rw.isO2OSub'?'background:#FFFDE7;':'';
+          const isSub=rw.isO2OSub; const isTot=rw.isO2OTotal;
+          const rowBg=isTot?'background:#FFF9C4':'isSub'?'background:#FFFDE7':'';
+          const bg2=isTot?'background:#FFF9C4;':isSub?'background:#FFFDE7;':'';
+          const fw=isTot?'font-weight:700;':'';
+          rows += '<tr style="border-bottom:1px solid #F1F5F9;'+bg2+fw+'">';
+          rows += '<td style="padding:5px 12px;'+(isSub?'color:#E65100;padding-left:22px;':'')+(isTot?'color:#5D4037;':'')+'">'+(isSub?'':'')+esc(rw.label)+'</td>';
+          rows += '<td style="padding:5px 12px;text-align:right">'+(rw.plan||0)+'</td>';
+          rows += '<td style="padding:5px 12px;text-align:right">'+(rw.actual||0)+'</td>';
+          rows += '<td style="padding:5px 12px;text-align:right;color:'+dc2+'">'+(d2>0?'+'+d2:d2)+'</td>';
+          rows += '<td style="padding:5px 12px;color:#6B7280">'+(rw.remark||'—')+'</td></tr>';
+        });
+      });
+      const gp=r.rows.reduce((s,rw)=>s+(rw.isO2OSub?0:(+rw.plan||0)),0);
+      const ga=r.rows.reduce((s,rw)=>s+(rw.isO2OSub?0:(+rw.actual||0)),0);
+      const gd=ga-gp;
+      rows += '<tr style="background:#EEF2FF;font-weight:700">';
+      rows += '<td style="padding:7px 12px;color:#1e40af">Grand Total</td>';
+      rows += '<td style="padding:7px 12px;text-align:right;color:#1e40af">'+gp+'</td>';
+      rows += '<td style="padding:7px 12px;text-align:right;color:#1e40af">'+ga+'</td>';
+      rows += '<td style="padding:7px 12px;text-align:right;color:'+(gd<0?'#DC2626':gd>0?'#059669':'#1e40af')+'">'+(gd>0?'+'+gd:gd)+'</td>';
+      rows += '<td></td></tr>';
+    } else {
+      rows += '<tr><td colspan="5" style="padding:12px;color:var(--tx2)">ไม่มีข้อมูลรายละเอียด</td></tr>';
+    }
+    rows += '</tbody></table></div></td></tr>';
+  });
+  tbody.innerHTML = rows;
+}
+
+function toggleDetail(rid) {
+  const row = document.getElementById(rid);
+  const arr = document.getElementById('arr-'+rid);
+  if (!row) return;
+  const isOpen = row.style.display !== 'none';
+  row.style.display = isOpen ? 'none' : 'table-row';
+  if (arr) arr.textContent = isOpen ? '▶' : '▼';
 }
 
 function askDel(id) { delId=id; document.getElementById('modal-del').classList.add('open'); }
@@ -1399,7 +1456,13 @@ function exportXL() {
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sumD),'สรุปกำลังคน');
   const detH = ['วันที่','ช่วงเวลา','เลขสาขา','ชื่อสาขา','Zone','Regional','หมวด','ประเภท','BUDGET','ACTUAL','ขาด/เกิน','หมายเหตุ'];
   const detD = [detH];
-  f.forEach(r=>r.rows.forEach(row=>detD.push([fmtDateXL(r.date),r.time,r.branchNum,r.branchName,r.zone,r.regional,row.sec,row.label,row.plan||0,row.actual||0,(row.actual||0)-(row.plan||0),row.remark||''])));
+  f.forEach(r=>{
+    if (!r.rows) return;
+    r.rows.forEach(row=>{
+      const lbl = row.isO2OSub ? '    '+row.label : row.label;
+      detD.push([fmtDateXL(r.date),r.time,r.branchNum,r.branchName,r.zone,r.regional,row.sec,lbl,row.plan||0,row.actual||0,(row.actual||0)-(row.plan||0),row.remark||'']);
+    });
+  });
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(detD),'รายละเอียด');
   XLSX.writeFile(wb,'Workforce_'+( from||'all')+'_to_'+(to||'all')+'.xlsx');
   toast('Export เรียบร้อย','ok');
@@ -1532,10 +1595,10 @@ function drawBranchChart(f, bNum) {
     '<div style="background:'+dbg+';border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:'+dc+';font-weight:700;text-transform:uppercase">ขาด/เกิน</div><div style="font-size:22px;font-weight:700;color:'+dc+'">'+(diff>0?'+'+diff:diff)+'</div><div style="font-size:11px;color:#6B7280">คน</div></div>'+
     '<div style="background:#FFFBEB;border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:#D97706;font-weight:700;text-transform:uppercase">อัตรา</div><div style="font-size:22px;font-weight:700;color:'+rc+'">'+rate+'%</div><div style="font-size:11px;color:#6B7280">% มาทำงาน</div></div>';
 
-  const rowLabels = items[0].rows.map(r=>r.label);
-  const planVals = items[0].rows.map(r=>+r.plan||0);
-  const actualVals = items[0].rows.map(r=>+r.actual||0);
-
+  const chartRows = items[0].rows ? items[0].rows.filter(r=>!r.isO2OSub) : [];
+  const rowLabels = chartRows.map(r=>r.label);
+  const planVals = chartRows.map(r=>+r.plan||0);
+  const actualVals = chartRows.map(r=>+r.actual||0);
   const topPlugin = {
     id:'topBranch',
     afterDatasetsDraw(chart) {
@@ -1987,126 +2050,48 @@ shakeStyle.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}20%,6
 document.head.appendChild(shakeStyle);
 
 
-// =============================================
-// RESPONSIVE / MOBILE NAVIGATION LOGIC
-// =============================================
-
-(function() {
-  // --- Sidebar toggle (hamburger for tablet 601–768px) ---
-  const sbToggle = document.getElementById('sb-toggle');
-  const sbOverlay = document.getElementById('sb-overlay');
-  const sidebar = document.querySelector('.sb');
-
-  function openSidebar() {
-    if (!sidebar) return;
-    sidebar.classList.add('open');
-    sbOverlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
+// ─── MOBILE SIDEBAR TOGGLE ────────────────────────────────
+function toggleSidebar() {
+  const sb = document.querySelector('.sb');
+  const bd = document.getElementById('sb-backdrop');
+  if (sb.classList.contains('open')) {
+    closeSidebar();
+  } else {
+    sb.classList.add('open');
+    bd.classList.add('open');
+    document.body.style.overflow = 'hidden'; // prevent scroll when open
   }
+}
 
-  function closeSidebar() {
-    if (!sidebar) return;
-    sidebar.classList.remove('open');
-    sbOverlay.classList.remove('open');
+function closeSidebar() {
+  const sb = document.querySelector('.sb');
+  const bd = document.getElementById('sb-backdrop');
+  sb.classList.remove('open');
+  bd.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close sidebar when nav item clicked on mobile
+document.querySelectorAll('.nav-item').forEach(item => {
+  const origClick = item.onclick;
+  item.addEventListener('click', () => {
+    if (window.innerWidth < 1024) closeSidebar();
+  });
+});
+
+// Close sidebar on resize to desktop
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 1024) {
+    document.querySelector('.sb').classList.remove('open');
+    document.getElementById('sb-backdrop').classList.remove('open');
     document.body.style.overflow = '';
   }
+});
 
-  if (sbToggle) {
-    sbToggle.addEventListener('click', () => {
-      sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-    });
-  }
-  if (sbOverlay) {
-    sbOverlay.addEventListener('click', closeSidebar);
-  }
-
-  // Close sidebar when nav item clicked on tablet
-  document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-    item.addEventListener('click', () => {
-      if (window.innerWidth <= 768) closeSidebar();
-    });
-  });
-
-  // --- Bottom Navigation (mobile ≤600px) ---
-  function syncBottomNav(activePage) {
-    document.querySelectorAll('.bnav-item').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.page === activePage);
-    });
-  }
-
-  document.querySelectorAll('.bnav-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const pg = btn.dataset.page;
-      if (!pg) return;
-
-      // Role check
-      const allowed = currentUser ? (ROLE_PAGES[currentUser.role] || []) : [];
-      if (!allowed.includes(pg)) { toast('⚠️ คุณไม่มีสิทธิ์เข้าหน้านี้', 'err'); return; }
-
-      // Sync sidebar active state
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      const sideNav = document.querySelector('.nav-item[data-page="'+pg+'"]');
-      if (sideNav) sideNav.classList.add('active');
-
-      // Switch page
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      const pageEl = document.getElementById('page-'+pg);
-      if (pageEl) pageEl.classList.add('active');
-
-      // Update title
-      const titles = {record:'บันทึกกำลังคนประจำวัน', history:'ประวัติการบันทึก', dashboard:'Dashboard สรุปกำลังคน'};
-      const titleEl = document.getElementById('topbar-title');
-      if (titleEl) titleEl.textContent = titles[pg] || pg;
-
-      if (pg === 'dashboard') renderDashboard();
-      if (pg === 'history') renderHistory();
-
-      syncBottomNav(pg);
-    });
-  });
-
-  // Keep bottom nav in sync when sidebar nav items are clicked
-  document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-    item.addEventListener('click', () => {
-      syncBottomNav(item.dataset.page);
-    });
-  });
-
-  // --- Hide bottom nav items based on role (called after login) ---
-  window._syncBNavRole = function() {
-    if (!currentUser) return;
-    const allowed = ROLE_PAGES[currentUser.role] || [];
-    document.querySelectorAll('.bnav-item[data-page]').forEach(btn => {
-      btn.style.display = allowed.includes(btn.dataset.page) ? 'flex' : 'none';
-    });
-    // Set active to first allowed page
-    const firstAllowed = allowed[0];
-    syncBottomNav(firstAllowed);
-  };
-
-  // Patch applyRoleUI to also sync bottom nav
-  const _origApplyRoleUI = window.applyRoleUI;
-  window.applyRoleUI = function() {
-    _origApplyRoleUI && _origApplyRoleUI();
-    if (window._syncBNavRole) window._syncBNavRole();
-  };
-
-  // --- Resize handler: close sidebar overlay on desktop resize ---
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-      closeSidebar();
-    }
-  });
-
-  // --- Prevent double-tap zoom on iOS for buttons ---
-  document.querySelectorAll('.btn, .bnav-item, .nav-item, .bc').forEach(el => {
-    el.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      el.click();
-    }, { passive: false });
-  });
-
-})();
+// Prevent iOS rubber-band scroll on sidebar
+document.querySelector('.sb').addEventListener('touchmove', e => {
+  e.stopPropagation();
+}, { passive: true });
 
 // Start
 checkAuth();
