@@ -933,6 +933,49 @@ input, select, textarea { font-size: max(16px, 1em); }
   </div>
 </div>
 
+<!-- EDIT RECORD MODAL -->
+<div class="modal-bg" id="modal-edit" style="z-index:300">
+  <div class="modal" style="width:680px;max-width:98vw;max-height:92vh;display:flex;flex-direction:column">
+    <div class="modal-hd">
+      <div>
+        <span class="modal-title">✏️ แก้ไขข้อมูลกำลังคน</span>
+        <div style="font-size:12px;color:var(--tx2);margin-top:2px" id="edit-subtitle">—</div>
+      </div>
+      <button class="modal-x" id="medit-x">×</button>
+    </div>
+    <div class="modal-bd" style="overflow-y:auto;flex:1;padding:14px 20px">
+      <!-- Header info row -->
+      <div class="g2" style="gap:12px;margin-bottom:14px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">วันที่บันทึก</label>
+          <input type="date" id="edit-date" class="form-control">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">ช่วงเวลา</label>
+          <select id="edit-time" class="form-control">
+            <option value="05:00-12:00">05:00 - 12:00</option>
+            <option value="12:00-16:00">12:00 - 16:00</option>
+            <option value="16:00-20:00">16:00 - 20:00</option>
+            <option value="20:00-00:00">20:00 - 00:00</option>
+          </select>
+        </div>
+      </div>
+      <!-- WF rows editor -->
+      <div id="edit-wf-container" style="border:1px solid var(--bdr);border-radius:var(--r2);overflow:hidden"></div>
+    </div>
+    <div class="modal-ft" style="justify-content:space-between;align-items:center">
+      <div style="font-size:12px;color:var(--tx2)" id="edit-footer-info"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" id="medit-cancel">ยกเลิก</button>
+        <button class="btn btn-primary" id="medit-ok">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          บันทึกการแก้ไข
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- LOGOUT CONFIRM MODAL -->
 <div id="logout-modal-bg">
   <div class="logout-modal">
@@ -1355,7 +1398,7 @@ function renderHistory() {
     rows += '<td class="tr '+dc+'">'+dt+'</td>';
     rows += '<td class="tr">'+rate+'</td>';
     rows += (currentUser && currentUser.role==='admin'
-      ? '<td><button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err)" onclick="event.stopPropagation();askDel('+r.id+')">ลบ</button></td>'
+      ? '<td style="white-space:nowrap"><button class="btn btn-outline btn-sm" style="color:var(--accent);border-color:var(--accent);margin-right:4px" onclick="event.stopPropagation();openEditModal('+r.id+')"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="margin-right:3px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>แก้ไข</button><button class="btn btn-outline btn-sm" style="color:var(--err);border-color:var(--err)" onclick="event.stopPropagation();askDel('+r.id+')">ลบ</button></td>'
       : '<td></td>');
     rows += '</tr>';
     // Detail expand row
@@ -1418,6 +1461,215 @@ function toggleDetail(rid) {
 }
 
 function askDel(id) { delId=id; document.getElementById('modal-del').classList.add('open'); }
+
+// ─── EDIT MODAL ────────────────────────────────────────────
+let editId = null;
+let editWfRows = [];
+
+function openEditModal(id) {
+  if (currentUser && currentUser.role !== 'admin') {
+    toast('⚠️ คุณไม่มีสิทธิ์แก้ไขข้อมูล', 'err'); return;
+  }
+  const rec = records.find(r => r.id === id);
+  if (!rec) { toast('ไม่พบข้อมูล', 'err'); return; }
+  editId = id;
+  editWfRows = JSON.parse(JSON.stringify(rec.rows || WF_TEMPLATE));
+
+  // Fill header info
+  document.getElementById('edit-subtitle').textContent =
+    'สาขา ' + rec.branchNum + ' — ' + rec.branchName.replace('บมจ.ซีพี แอ็กซ์ตร้า สาขา','') +
+    ' | ' + rec.zone + ' · ' + rec.regional;
+  document.getElementById('edit-date').value = rec.date;
+  document.getElementById('edit-time').value = rec.time;
+
+  renderEditWFTable();
+  document.getElementById('modal-edit').classList.add('open');
+}
+
+function renderEditWFTable() {
+  const con = document.getElementById('edit-wf-container');
+  const COLS = '2fr 90px 90px 80px 1fr';
+
+  let html = '<div style="display:grid;grid-template-columns:'+COLS+';background:#F8FAFC;border-bottom:1px solid var(--bdr);padding:8px 14px">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px">ประเภทกำลังคน</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;text-align:right">BUDGET</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;text-align:right">ACTUAL</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;text-align:right">ขาด/เกิน</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase">หมายเหตุ</div>'
+    + '</div>';
+
+  const secs = [...new Set(editWfRows.map(r => r.sec))];
+  secs.forEach(sec => {
+    html += '<div style="background:#F1F5F9;padding:5px 14px;font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr-l)">'+sec+'</div>';
+    editWfRows.filter(r => r.sec === sec).forEach(row => {
+      const idx = editWfRows.indexOf(row);
+      const diff = (row.actual||0) - (row.plan||0);
+      const dc = diff < 0 ? 'color:#DC2626' : diff > 0 ? 'color:#059669' : 'color:#9CA3AF';
+      const dt = diff > 0 ? '+'+diff : diff;
+
+      if (row.isO2OTotal) {
+        html += '<div style="display:grid;grid-template-columns:'+COLS+';background:#FFF9C4;border-bottom:1px solid #F9A825;padding:7px 14px;align-items:center">'
+          + '<div style="font-weight:700;font-size:13px;color:#5D4037">'+esc(row.label)+'</div>'
+          + '<div style="text-align:right;font-weight:700;font-size:13px" id="eo2o-tp">'+( row.plan||0)+'</div>'
+          + '<div style="text-align:right;font-weight:700;font-size:13px" id="eo2o-ta">'+(row.actual||0)+'</div>'
+          + '<div style="text-align:right;font-weight:700;font-size:13px;'+dc+'" id="ed'+idx+'">'+dt+'</div>'
+          + '<div></div></div>';
+      } else {
+        const subBg = row.isO2OSub ? 'background:#FFFDE7;' : '';
+        const subPl = row.isO2OSub ? 'padding-left:22px;' : '';
+        const subClr = row.isO2OSub ? 'color:#E65100;' : '';
+        html += '<div style="display:grid;grid-template-columns:'+COLS+';border-bottom:1px solid var(--bdr-l);padding:6px 14px;align-items:center;'+subBg+'">'
+          + '<div><input class="le" value="'+esc(row.label)+'" data-ef="label" data-ei="'+idx+'" style="'+subPl+subClr+'font-weight:'+(row.isO2OSub?'500':'400')+'"></div>'
+          + '<div style="text-align:right"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-ef="plan" data-ei="'+idx+'" style="'+(row.isO2OSub?'border-color:#F9A825':'')+'"></div>'
+          + '<div style="text-align:right"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-ef="actual" data-ei="'+idx+'" style="'+(row.isO2OSub?'border-color:#F9A825':'')+'"></div>'
+          + '<div style="text-align:right;font-size:13px;'+dc+'" id="ed'+idx+'">'+dt+'</div>'
+          + '<div><input class="le" value="'+esc(row.remark)+'" data-ef="remark" data-ei="'+idx+'" placeholder="หมายเหตุ..."></div>'
+          + '</div>';
+      }
+    });
+  });
+
+  // Grand total row
+  const gp = editWfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.plan||0)),0);
+  const ga = editWfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.actual||0)),0);
+  const gd = ga - gp;
+  const gdc = gd < 0 ? 'color:#DC2626' : gd > 0 ? 'color:#059669' : 'color:#1e40af';
+  html += '<div style="display:grid;grid-template-columns:'+COLS+';background:#EEF2FF;padding:9px 14px;align-items:center;font-weight:700">'
+    + '<div style="color:#1e40af">Grand Total</div>'
+    + '<div style="text-align:right;color:#1e40af" id="etp">'+gp+'</div>'
+    + '<div style="text-align:right;color:#1e40af" id="eta">'+ga+'</div>'
+    + '<div style="text-align:right;'+gdc+'" id="etd">'+(gd>0?'+'+gd:gd)+'</div>'
+    + '<div></div></div>';
+
+  con.innerHTML = html;
+  updEditFooter();
+
+  // Bind inputs
+  con.querySelectorAll('input[data-ef]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const idx = +inp.dataset.ei;
+      const f = inp.dataset.ef;
+      if (f === 'plan' || f === 'actual') editWfRows[idx][f] = +inp.value || 0;
+      else editWfRows[idx][f] = inp.value;
+      updEditDiff(idx);
+      updEditTotals();
+    });
+  });
+}
+
+function updEditDiff(idx) {
+  const el = document.getElementById('ed'+idx);
+  if (!el) return;
+  const diff = (editWfRows[idx].actual||0) - (editWfRows[idx].plan||0);
+  el.textContent = diff > 0 ? '+'+diff : diff;
+  el.style.color = diff < 0 ? '#DC2626' : diff > 0 ? '#059669' : '#9CA3AF';
+  if (editWfRows[idx].isO2OSub) updEditO2OTotal();
+}
+
+function updEditO2OTotal() {
+  const subs = editWfRows.filter(r => r.isO2OSub);
+  const totRow = editWfRows.find(r => r.isO2OTotal);
+  if (!totRow) return;
+  const sp = subs.reduce((s,r) => s+(+r.plan||0), 0);
+  const sa = subs.reduce((s,r) => s+(+r.actual||0), 0);
+  totRow.plan = sp; totRow.actual = sa;
+  const elTp = document.getElementById('eo2o-tp');
+  const elTa = document.getElementById('eo2o-ta');
+  if (elTp) elTp.textContent = sp;
+  if (elTa) elTa.textContent = sa;
+  const diff = sa - sp;
+  const totIdx = editWfRows.indexOf(totRow);
+  const elD = document.getElementById('ed'+totIdx);
+  if (elD) {
+    elD.textContent = diff > 0 ? '+'+diff : diff;
+    elD.style.color = diff < 0 ? '#DC2626' : diff > 0 ? '#059669' : '#9CA3AF';
+  }
+}
+
+function updEditTotals() {
+  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.plan||0)), 0);
+  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.actual||0)), 0);
+  const gd = ga - gp;
+  const tp = document.getElementById('etp'); if (tp) tp.textContent = gp;
+  const ta = document.getElementById('eta'); if (ta) ta.textContent = ga;
+  const td = document.getElementById('etd');
+  if (td) {
+    td.textContent = gd > 0 ? '+'+gd : gd;
+    td.style.color = gd < 0 ? '#DC2626' : gd > 0 ? '#059669' : '#1e40af';
+  }
+  updEditFooter();
+}
+
+function updEditFooter() {
+  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.plan||0)), 0);
+  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.actual||0)), 0);
+  const rate = gp ? (ga/gp*100).toFixed(1) : '0';
+  const el = document.getElementById('edit-footer-info');
+  if (el) el.innerHTML = 'BUDGET: <b>'+gp+'</b> &nbsp;|&nbsp; ACTUAL: <b>'+ga+'</b> &nbsp;|&nbsp; อัตรา: <b>'+rate+'%</b>';
+}
+
+function doEdit() {
+  if (currentUser && currentUser.role !== 'admin') {
+    toast('⚠️ คุณไม่มีสิทธิ์แก้ไขข้อมูล', 'err'); return;
+  }
+  const rec = records.find(r => r.id === editId);
+  if (!rec) { toast('ไม่พบข้อมูล', 'err'); return; }
+
+  const newDate = document.getElementById('edit-date').value;
+  const newTime = document.getElementById('edit-time').value;
+  if (!newDate) { toast('กรุณาเลือกวันที่', 'err'); return; }
+
+  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.plan||0)), 0);
+  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.actual||0)), 0);
+
+  const updated = {
+    ...rec,
+    date: newDate,
+    time: newTime,
+    totalPlan: gp,
+    totalActual: ga,
+    diff: ga - gp,
+    rows: JSON.parse(JSON.stringify(editWfRows))
+  };
+
+  const btn = document.getElementById('medit-ok');
+  btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
+
+  const saveUpdated = () => {
+    if (rec._fbKey) {
+      db.ref('records/' + rec._fbKey).set(updated)
+        .then(() => {
+          toast('✅ แก้ไขข้อมูลเรียบร้อย', 'ok');
+          document.getElementById('modal-edit').classList.remove('open');
+        })
+        .catch(err => {
+          console.error(err);
+          fallbackEdit(updated);
+        })
+        .finally(() => { btn.disabled = false; btn.textContent = 'บันทึกการแก้ไข'; });
+    } else {
+      fallbackEdit(updated);
+      btn.disabled = false; btn.textContent = 'บันทึกการแก้ไข';
+    }
+  };
+
+  saveUpdated();
+}
+
+function fallbackEdit(updated) {
+  const idx = records.findIndex(r => r.id === updated.id);
+  if (idx !== -1) records[idx] = updated;
+  localStorage.setItem('wf_v2', JSON.stringify(records));
+  renderHistory();
+  toast('✅ แก้ไขข้อมูลเรียบร้อย (offline)', 'ok');
+  document.getElementById('modal-edit').classList.remove('open');
+}
+
+function closeEditModal() {
+  document.getElementById('modal-edit').classList.remove('open');
+  editId = null;
+  editWfRows = [];
+}
 function doDel() {
   if (currentUser && currentUser.role !== 'admin') {
     toast('⚠️ คุณไม่มีสิทธิ์ลบข้อมูล', 'err');
@@ -1776,6 +2028,14 @@ function bindAll() {
   document.getElementById('mdel-x').addEventListener('click', ()=>document.getElementById('modal-del').classList.remove('open'));
   document.getElementById('mdel-cancel').addEventListener('click', ()=>document.getElementById('modal-del').classList.remove('open'));
   document.getElementById('mdel-ok').addEventListener('click', doDel);
+
+  // Edit modal bindings
+  document.getElementById('medit-x').addEventListener('click', closeEditModal);
+  document.getElementById('medit-cancel').addEventListener('click', closeEditModal);
+  document.getElementById('medit-ok').addEventListener('click', doEdit);
+  document.getElementById('modal-edit').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+  });
 }
 
 function getDF() {
