@@ -1007,18 +1007,19 @@ const WF_TEMPLATE = [
   {sec:"Fresh Food",id:"fish",label:"Fish",plan:0,actual:0,remark:""},
   {sec:"Fresh Food",id:"bakery",label:"Bakery",plan:0,actual:0,remark:""},
   {sec:"Fresh Food",id:"frozen",label:"Frozen & Dairy",plan:0,actual:0,remark:""},
+  {sec:"Fresh Food",id:"fresh",label:"Total : Fresh Food",plan:0,actual:0,remark:"",isFreshTotal:true},
   {sec:"Dry Food",id:"dry",label:"Total : Dry Food",plan:0,actual:0,remark:""},
   {sec:"Non Food",id:"nf",label:"Total : Non Food",plan:0,actual:0,remark:""},
   {sec:"Operations",id:"o2o_picker",label:"Picker / Packer",plan:0,actual:0,remark:"",isO2OSub:true},
   {sec:"Operations",id:"o2o_loader",label:"Loader",plan:0,actual:0,remark:"",isO2OSub:true},
-  {sec:"Operations",id:"o2o_driver",label:"Driver",plan:0,actual:0,remark:"",isO2OSub:true},
+  {sec:"Operations",id:"o2o_driver",label:"Driver (คนขับรถขนส่ง)",plan:0,actual:0,remark:"",isO2OSub:true},
   {sec:"Operations",id:"o2o_admin",label:"Admin O2O",plan:0,actual:0,remark:"",isO2OSub:true},
   {sec:"Operations",id:"o2o",label:"Total : O2O",plan:0,actual:0,remark:"",isO2OTotal:true},
   {sec:"Operations",id:"gr",label:"GR",plan:0,actual:0,remark:""},
   {sec:"Operations",id:"ga",label:"GA",plan:0,actual:0,remark:""},
-  {sec:"Operations",id:"cs",label:"CS (Cashier)",plan:0,actual:0,remark:""},
-  {sec:"Operations",id:"oos",label:"OOS",plan:0,actual:0,remark:""},
-  {sec:"Operations",id:"safety",label:"Safety",plan:0,actual:0,remark:""}
+  {sec:"Operations",id:"cs",label:"CS (Cashier) PM+CK+REC",plan:0,actual:0,remark:""},
+  {sec:"Operations",id:"oos",label:"OOS/SOS (SSS เดิม)",plan:0,actual:0,remark:""},
+  {sec:"Operations",id:"safety",label:"Safety (จป.)",plan:0,actual:0,remark:""}
 ];
 
 // STATE
@@ -1230,9 +1231,17 @@ function renderWFTable() {
           +'<div class="wf-cell tr fw6 '+dc+'" id="d'+idx+'">'+dt+'</div>'
           +'<div class="wf-cell"></div>'
           +'</div>';
+      } else if (row.isFreshTotal) {
+        html += '<div class="wf-row wf-total" style="grid-template-columns:'+COLS+';background:#DCFCE7;border-top:2px solid #16A34A">'
+          +'<div class="wf-cell fw6" style="color:#166534">'+esc(row.label)+'</div>'
+          +'<div class="wf-cell tr fw6" id="fresh-tp">'+(row.plan||0)+'</div>'
+          +'<div class="wf-cell tr fw6" id="fresh-ta">'+(row.actual||0)+'</div>'
+          +'<div class="wf-cell tr fw6 '+dc+'" id="d'+idx+'">'+dt+'</div>'
+          +'<div class="wf-cell"></div>'
+          +'</div>';
       } else if (row.isO2OSub) {
         html += '<div class="wf-row" style="grid-template-columns:'+COLS+';background:#FFFDE7">'
-          +'<div class="wf-cell"><input class="le" value="'+esc(row.label)+'" data-f="label" data-i="'+idx+'" style="color:#E65100;font-weight:500"></div>'
+          +'<div class="wf-cell" style="color:#E65100;font-weight:500;padding-left:22px">'+esc(row.label)+'</div>'
           +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-f="plan" data-i="'+idx+'" style="border-color:#F9A825"></div>'
           +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-f="actual" data-i="'+idx+'" style="border-color:#F9A825"></div>'
           +'<div class="wf-cell tr '+dc+'" id="d'+idx+'">'+dt+'</div>'
@@ -1240,7 +1249,7 @@ function renderWFTable() {
           +'</div>';
       } else {
         html += '<div class="wf-row" style="grid-template-columns:'+COLS+'">'
-          +'<div class="wf-cell"><input class="le" value="'+esc(row.label)+'" data-f="label" data-i="'+idx+'"></div>'
+          +'<div class="wf-cell">'+esc(row.label)+'</div>'
           +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-f="plan" data-i="'+idx+'"></div>'
           +'<div class="wf-cell tr"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-f="actual" data-i="'+idx+'"></div>'
           +'<div class="wf-cell tr '+dc+'" id="d'+idx+'">'+dt+'</div>'
@@ -1250,8 +1259,8 @@ function renderWFTable() {
     });
   });
 
-  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.plan||0)),0);
-  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.actual||0)),0);
+  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub||r.isFreshTotal?0:(+r.plan||0)),0);
+  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub||r.isFreshTotal?0:(+r.actual||0)),0);
   const td = ta-tp;
   const tdc = td<0?'diff-n':td>0?'diff-p':'diff-z';
   html += '<div class="wf-row wf-total" style="grid-template-columns:'+COLS+'">'
@@ -1264,6 +1273,7 @@ function renderWFTable() {
 
   con.innerHTML = html;
   updO2OTotal();
+  updFreshTotal();
 
   con.querySelectorAll('input[data-f]').forEach(inp => {
     inp.addEventListener('input', () => {
@@ -1285,6 +1295,30 @@ function updDiff(idx) {
   el.className = 'wf-cell tr '+(diff<0?'diff-n':diff>0?'diff-p':'diff-z');
   // If editing an O2O sub-row, update Total O2O
   if (wfRows[idx].isO2OSub) updO2OTotal();
+  // If editing a Fresh Food row (excluding total itself), update Total Fresh Food
+  if (wfRows[idx].sec === 'Fresh Food' && !wfRows[idx].isFreshTotal) updFreshTotal();
+}
+
+function updFreshTotal() {
+  // Sum all Fresh Food rows (excluding the total row itself)
+  const subs = wfRows.filter(r => r.sec === 'Fresh Food' && !r.isFreshTotal);
+  const totRow = wfRows.find(r => r.isFreshTotal);
+  if (!totRow) return;
+  const sp = subs.reduce((s,r)=>s+(+r.plan||0),0);
+  const sa = subs.reduce((s,r)=>s+(+r.actual||0),0);
+  totRow.plan = sp;
+  totRow.actual = sa;
+  const elTp = document.getElementById('fresh-tp');
+  const elTa = document.getElementById('fresh-ta');
+  if (elTp) elTp.textContent = sp;
+  if (elTa) elTa.textContent = sa;
+  const diff = sa - sp;
+  const totIdx = wfRows.indexOf(totRow);
+  const elD = document.getElementById('d'+totIdx);
+  if (elD) {
+    elD.textContent = diff>0?'+'+diff:diff;
+    elD.className = 'wf-cell tr fw6 '+(diff<0?'diff-n':diff>0?'diff-p':'diff-z');
+  }
 }
 
 function updO2OTotal() {
@@ -1310,9 +1344,9 @@ function updO2OTotal() {
 }
 
 function updTotals() {
-  // Grand total excludes O2O sub-rows (use Total O2O instead to avoid double count)
-  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.plan||0)),0);
-  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.actual||0)),0);
+  // Grand total excludes O2O sub-rows and Fresh Total (use their totals instead to avoid double count)
+  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub||r.isFreshTotal?0:(+r.plan||0)),0);
+  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub||r.isFreshTotal?0:(+r.actual||0)),0);
   const td = ta-tp;
   document.getElementById('tp').textContent = tp;
   document.getElementById('ta').textContent = ta;
@@ -1330,9 +1364,9 @@ function saveRecord() {
   const date = document.getElementById('rec-date').value;
   const time = document.getElementById('rec-time').value;
   if (!date) { toast('กรุณาเลือกวันที่','err'); return; }
-  // Exclude O2O sub-rows from grand total (O2O Total row already sums them)
-  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.plan||0)),0);
-  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.actual||0)),0);
+  // Exclude O2O sub-rows and Fresh Total from grand total (totals already sum their children)
+  const tp = wfRows.reduce((s,r)=>s+(r.isO2OSub||r.isFreshTotal?0:(+r.plan||0)),0);
+  const ta = wfRows.reduce((s,r)=>s+(r.isO2OSub||r.isFreshTotal?0:(+r.actual||0)),0);
   const rec = {
     id: Date.now(), date, time,
     branchNum: selBranch.num, branchName: selBranch.name,
@@ -1421,21 +1455,19 @@ function renderHistory() {
         r.rows.filter(rw=>rw.sec===sec).forEach(rw => {
           const d2=(rw.actual||0)-(rw.plan||0);
           const dc2=d2<0?'#DC2626':d2>0?'#059669':'#9CA3AF';
-          const bg=rw.isO2OTotal?'background:#FFF9C4;':'rw.isO2OSub'?'background:#FFFDE7;':'';
-          const isSub=rw.isO2OSub; const isTot=rw.isO2OTotal;
-          const rowBg=isTot?'background:#FFF9C4':'isSub'?'background:#FFFDE7':'';
-          const bg2=isTot?'background:#FFF9C4;':isSub?'background:#FFFDE7;':'';
-          const fw=isTot?'font-weight:700;':'';
+          const isSub=rw.isO2OSub; const isTot=rw.isO2OTotal; const isFresh=rw.isFreshTotal;
+          const bg2=isTot?'background:#FFF9C4;':isFresh?'background:#DCFCE7;':isSub?'background:#FFFDE7;':'';
+          const fw=(isTot||isFresh)?'font-weight:700;':'';
           rows += '<tr style="border-bottom:1px solid #F1F5F9;'+bg2+fw+'">';
-          rows += '<td style="padding:5px 12px;'+(isSub?'color:#E65100;padding-left:22px;':'')+(isTot?'color:#5D4037;':'')+'">'+(isSub?'':'')+esc(rw.label)+'</td>';
+          rows += '<td style="padding:5px 12px;'+(isSub?'color:#E65100;padding-left:22px;':'')+(isTot?'color:#5D4037;':'')+(isFresh?'color:#166534;':'')+'">'+esc(rw.label)+'</td>';
           rows += '<td style="padding:5px 12px;text-align:right">'+(rw.plan||0)+'</td>';
           rows += '<td style="padding:5px 12px;text-align:right">'+(rw.actual||0)+'</td>';
           rows += '<td style="padding:5px 12px;text-align:right;color:'+dc2+'">'+(d2>0?'+'+d2:d2)+'</td>';
           rows += '<td style="padding:5px 12px;color:#6B7280">'+(rw.remark||'—')+'</td></tr>';
         });
       });
-      const gp=r.rows.reduce((s,rw)=>s+(rw.isO2OSub?0:(+rw.plan||0)),0);
-      const ga=r.rows.reduce((s,rw)=>s+(rw.isO2OSub?0:(+rw.actual||0)),0);
+      const gp=r.rows.reduce((s,rw)=>s+(rw.isO2OSub||rw.isFreshTotal?0:(+rw.plan||0)),0);
+      const ga=r.rows.reduce((s,rw)=>s+(rw.isO2OSub||rw.isFreshTotal?0:(+rw.actual||0)),0);
       const gd=ga-gp;
       rows += '<tr style="background:#EEF2FF;font-weight:700">';
       rows += '<td style="padding:7px 12px;color:#1e40af">Grand Total</td>';
@@ -1514,14 +1546,26 @@ function renderEditWFTable() {
           + '<div style="text-align:right;font-weight:700;font-size:13px" id="eo2o-ta">'+(row.actual||0)+'</div>'
           + '<div style="text-align:right;font-weight:700;font-size:13px;'+dc+'" id="ed'+idx+'">'+dt+'</div>'
           + '<div></div></div>';
+      } else if (row.isFreshTotal) {
+        html += '<div style="display:grid;grid-template-columns:'+COLS+';background:#DCFCE7;border-bottom:1px solid #16A34A;padding:7px 14px;align-items:center">'
+          + '<div style="font-weight:700;font-size:13px;color:#166534">'+esc(row.label)+'</div>'
+          + '<div style="text-align:right;font-weight:700;font-size:13px" id="efresh-tp">'+(row.plan||0)+'</div>'
+          + '<div style="text-align:right;font-weight:700;font-size:13px" id="efresh-ta">'+(row.actual||0)+'</div>'
+          + '<div style="text-align:right;font-weight:700;font-size:13px;'+dc+'" id="ed'+idx+'">'+dt+'</div>'
+          + '<div></div></div>';
+      } else if (row.isO2OSub) {
+        html += '<div style="display:grid;grid-template-columns:'+COLS+';border-bottom:1px solid var(--bdr-l);padding:6px 14px;align-items:center;background:#FFFDE7;">'
+          + '<div style="padding-left:22px;color:#E65100;font-weight:500;font-size:13px">'+esc(row.label)+'</div>'
+          + '<div style="text-align:right"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-ef="plan" data-ei="'+idx+'" style="border-color:#F9A825"></div>'
+          + '<div style="text-align:right"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-ef="actual" data-ei="'+idx+'" style="border-color:#F9A825"></div>'
+          + '<div style="text-align:right;font-size:13px;'+dc+'" id="ed'+idx+'">'+dt+'</div>'
+          + '<div><input class="le" value="'+esc(row.remark)+'" data-ef="remark" data-ei="'+idx+'" placeholder="หมายเหตุ..."></div>'
+          + '</div>';
       } else {
-        const subBg = row.isO2OSub ? 'background:#FFFDE7;' : '';
-        const subPl = row.isO2OSub ? 'padding-left:22px;' : '';
-        const subClr = row.isO2OSub ? 'color:#E65100;' : '';
-        html += '<div style="display:grid;grid-template-columns:'+COLS+';border-bottom:1px solid var(--bdr-l);padding:6px 14px;align-items:center;'+subBg+'">'
-          + '<div><input class="le" value="'+esc(row.label)+'" data-ef="label" data-ei="'+idx+'" style="'+subPl+subClr+'font-weight:'+(row.isO2OSub?'500':'400')+'"></div>'
-          + '<div style="text-align:right"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-ef="plan" data-ei="'+idx+'" style="'+(row.isO2OSub?'border-color:#F9A825':'')+'"></div>'
-          + '<div style="text-align:right"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-ef="actual" data-ei="'+idx+'" style="'+(row.isO2OSub?'border-color:#F9A825':'')+'"></div>'
+        html += '<div style="display:grid;grid-template-columns:'+COLS+';border-bottom:1px solid var(--bdr-l);padding:6px 14px;align-items:center">'
+          + '<div style="font-size:13px">'+esc(row.label)+'</div>'
+          + '<div style="text-align:right"><input class="ie" type="number" min="0" value="'+(row.plan||0)+'" data-ef="plan" data-ei="'+idx+'"></div>'
+          + '<div style="text-align:right"><input class="ie" type="number" min="0" value="'+(row.actual||0)+'" data-ef="actual" data-ei="'+idx+'"></div>'
           + '<div style="text-align:right;font-size:13px;'+dc+'" id="ed'+idx+'">'+dt+'</div>'
           + '<div><input class="le" value="'+esc(row.remark)+'" data-ef="remark" data-ei="'+idx+'" placeholder="หมายเหตุ..."></div>'
           + '</div>';
@@ -1530,8 +1574,8 @@ function renderEditWFTable() {
   });
 
   // Grand total row
-  const gp = editWfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.plan||0)),0);
-  const ga = editWfRows.reduce((s,r)=>s+(r.isO2OSub?0:(+r.actual||0)),0);
+  const gp = editWfRows.reduce((s,r)=>s+(r.isO2OSub||r.isFreshTotal?0:(+r.plan||0)),0);
+  const ga = editWfRows.reduce((s,r)=>s+(r.isO2OSub||r.isFreshTotal?0:(+r.actual||0)),0);
   const gd = ga - gp;
   const gdc = gd < 0 ? 'color:#DC2626' : gd > 0 ? 'color:#059669' : 'color:#1e40af';
   html += '<div style="display:grid;grid-template-columns:'+COLS+';background:#EEF2FF;padding:9px 14px;align-items:center;font-weight:700">'
@@ -1543,6 +1587,7 @@ function renderEditWFTable() {
 
   con.innerHTML = html;
   updEditFooter();
+  if (typeof updEditFreshTotal === 'function') updEditFreshTotal();
 
   // Bind inputs
   con.querySelectorAll('input[data-ef]').forEach(inp => {
@@ -1564,6 +1609,27 @@ function updEditDiff(idx) {
   el.textContent = diff > 0 ? '+'+diff : diff;
   el.style.color = diff < 0 ? '#DC2626' : diff > 0 ? '#059669' : '#9CA3AF';
   if (editWfRows[idx].isO2OSub) updEditO2OTotal();
+  if (editWfRows[idx].sec === 'Fresh Food' && !editWfRows[idx].isFreshTotal) updEditFreshTotal();
+}
+
+function updEditFreshTotal() {
+  const subs = editWfRows.filter(r => r.sec === 'Fresh Food' && !r.isFreshTotal);
+  const totRow = editWfRows.find(r => r.isFreshTotal);
+  if (!totRow) return;
+  const sp = subs.reduce((s,r) => s+(+r.plan||0), 0);
+  const sa = subs.reduce((s,r) => s+(+r.actual||0), 0);
+  totRow.plan = sp; totRow.actual = sa;
+  const elTp = document.getElementById('efresh-tp');
+  const elTa = document.getElementById('efresh-ta');
+  if (elTp) elTp.textContent = sp;
+  if (elTa) elTa.textContent = sa;
+  const diff = sa - sp;
+  const totIdx = editWfRows.indexOf(totRow);
+  const elD = document.getElementById('ed'+totIdx);
+  if (elD) {
+    elD.textContent = diff > 0 ? '+'+diff : diff;
+    elD.style.color = diff < 0 ? '#DC2626' : diff > 0 ? '#059669' : '#9CA3AF';
+  }
 }
 
 function updEditO2OTotal() {
@@ -1587,8 +1653,8 @@ function updEditO2OTotal() {
 }
 
 function updEditTotals() {
-  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.plan||0)), 0);
-  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.actual||0)), 0);
+  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub||r.isFreshTotal?0:(+r.plan||0)), 0);
+  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub||r.isFreshTotal?0:(+r.actual||0)), 0);
   const gd = ga - gp;
   const tp = document.getElementById('etp'); if (tp) tp.textContent = gp;
   const ta = document.getElementById('eta'); if (ta) ta.textContent = ga;
@@ -1601,8 +1667,8 @@ function updEditTotals() {
 }
 
 function updEditFooter() {
-  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.plan||0)), 0);
-  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.actual||0)), 0);
+  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub||r.isFreshTotal?0:(+r.plan||0)), 0);
+  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub||r.isFreshTotal?0:(+r.actual||0)), 0);
   const rate = gp ? (ga/gp*100).toFixed(1) : '0';
   const el = document.getElementById('edit-footer-info');
   if (el) el.innerHTML = 'BUDGET: <b>'+gp+'</b> &nbsp;|&nbsp; ACTUAL: <b>'+ga+'</b> &nbsp;|&nbsp; อัตรา: <b>'+rate+'%</b>';
@@ -1619,8 +1685,8 @@ function doEdit() {
   const newTime = document.getElementById('edit-time').value;
   if (!newDate) { toast('กรุณาเลือกวันที่', 'err'); return; }
 
-  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.plan||0)), 0);
-  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub?0:(+r.actual||0)), 0);
+  const gp = editWfRows.reduce((s,r) => s+(r.isO2OSub||r.isFreshTotal?0:(+r.plan||0)), 0);
+  const ga = editWfRows.reduce((s,r) => s+(r.isO2OSub||r.isFreshTotal?0:(+r.actual||0)), 0);
 
   const updated = {
     ...rec,
@@ -1847,7 +1913,7 @@ function drawBranchChart(f, bNum) {
     '<div style="background:'+dbg+';border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:'+dc+';font-weight:700;text-transform:uppercase">ขาด/เกิน</div><div style="font-size:22px;font-weight:700;color:'+dc+'">'+(diff>0?'+'+diff:diff)+'</div><div style="font-size:11px;color:#6B7280">คน</div></div>'+
     '<div style="background:#FFFBEB;border-radius:8px;padding:10px 14px;min-width:100px"><div style="font-size:11px;color:#D97706;font-weight:700;text-transform:uppercase">อัตรา</div><div style="font-size:22px;font-weight:700;color:'+rc+'">'+rate+'%</div><div style="font-size:11px;color:#6B7280">% มาทำงาน</div></div>';
 
-  const chartRows = items[0].rows ? items[0].rows.filter(r=>!r.isO2OSub) : [];
+  const chartRows = items[0].rows ? items[0].rows.filter(r=>!r.isO2OSub && !r.isFreshTotal) : [];
   const rowLabels = chartRows.map(r=>r.label);
   const planVals = chartRows.map(r=>+r.plan||0);
   const actualVals = chartRows.map(r=>+r.actual||0);
